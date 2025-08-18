@@ -9,3 +9,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  Individual
+  Business
+  Recycler
+  Admin
+}
+
+enum WasteType {
+  Plastic
+  Metal
+  Organic
+}
+
+enum itemStatus {
+  Available
+  Sold
+  Reserved
+}
+
+model User {
+  id                   Int     @id   @default(autoincrement())
+  email                String   @unique
+  username             String 
+  password             String 
+  confirmPassword      String
+  role                 Role      @default(Individual)
+  phone                String?
+  isVerified           Boolean   @default(false)  @map("is_verified")
+  createdAt            DateTime  @default(now())  @map("created_at")
+  lastActive           DateTime? @map("last_active")
+  passwordResetToken   String?   @map("password_reset_token")
+  passwordChangedAt    DateTime? @map("Password_changed_at")
+
+  receivedMessages     Message[] @relation("ReceiveMessage") 
+  sentMessages         Message[] @relation("SendMessage")
+
+  listings             Listing[]
+}
+
+model Listing {
+  id             Int  @id    @default(autoincrement())
+  title          String 
+  description    String?
+  type           WasteType 
+  subType        String?     @map("sub_type")
+  quantity       Float
+  price          Float
+  status         itemStatus  @default(Available)
+  createdAt      DateTime    @default(now())     @map("created_at")
+  updatedAt      DateTime    @default(now())     @map("updated_at")
+  user           User        @relation(fields: [userId], references: [id])
+  userId         Int         @map("user_id")
+}
+
+model Message {
+  id         Int        @id             @default(autoincrement())
+  content    String
+  isRead     Boolean    @map("is_read")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  sender     User       @relation("SendMessage" , fields: [senderId] ,references : [id])
+  senderId   Int        @map("sender_id")
+
+  receiver   User       @relation("ReceiveMessage" , fields: [receiverId] ,references : [id])
+  receiverId Int        @map("receiver_id")
+}
