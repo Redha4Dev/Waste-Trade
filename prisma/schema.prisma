@@ -58,7 +58,7 @@ model Listing {
   price          Float
   status         itemStatus  @default(Available)
   createdAt      DateTime    @default(now())     @map("created_at")
-  updatedAt      DateTime    @default(now())     @map("updated_at")
+  updatedAt      DateTime    @updatedAt     @map("updated_at")
   user           User        @relation(fields: [userId], references: [id])
   userId         Int         @map("user_id")
 }
