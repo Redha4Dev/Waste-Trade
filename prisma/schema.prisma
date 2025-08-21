@@ -30,10 +30,9 @@ enum itemStatus {
 
 model User {
   id                   Int     @id   @default(autoincrement())
-  email                String   @unique
-  username             String 
-  password             String 
-  confirmPassword      String
+  email                String?   @unique
+  username             String? 
+  password             String? 
   role                 Role      @default(Individual)
   phone                String?
   isVerified           Boolean   @default(false)  @map("is_verified")

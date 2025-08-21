@@ -12,8 +12,8 @@ export class AuthServices {
    }
 
    //hash Password
-   static async hashPassword(password: string) {
-    return bcrypt.hash(password , 12)
+   static async hashPassword(password: string) { 
+       return await bcrypt.hash(password , 12)
    }
 
    //compare Password
