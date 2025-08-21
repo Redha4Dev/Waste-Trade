@@ -10,7 +10,7 @@ const buyerNavItems = [
 ];
 
 const sellerNavItems = [
-  { label: "Dashboard", href: "/seller/dashboard" },
+  { label: "Dashboard", href: "/seller/" },
   { label: "Messages", href: "/seller/messages" },
   { label: "Transactions", href: "/seller/transactions" },
 ];
