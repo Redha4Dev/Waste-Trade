@@ -2,6 +2,8 @@ import {prisma} from '@/lib/prisma'
 import { NextRequest , NextResponse } from 'next/server'
 import { AuthController } from '@/backend/controllers/authController'
 
-export async function POST(request : NextRequest) {
-    return AuthController.login(request)
-}
+// export async function POST(request : NextRequest) {
+//     return AuthController.login
+// }
+
+export const POST = AuthController.login

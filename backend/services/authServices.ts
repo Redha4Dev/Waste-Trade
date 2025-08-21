@@ -7,9 +7,15 @@ export class AuthServices {
     //used in the logIn logic
    static async getUserByEmail (email : string){
     return await prisma.user.findUnique({
-        where : {email}
+        where : {
+            email ,
+            isVerified : false
+        }
     })
    }
+
+   //get the user by verification code
+   
 
    //hash Password
    static async hashPassword(password: string) { 
