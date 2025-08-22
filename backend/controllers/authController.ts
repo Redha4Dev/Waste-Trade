@@ -8,9 +8,11 @@ import { Validation } from "../middleware/validation";
 import { errorHandler } from "../utils/errorHandler";
 import { appError } from "../utils/appError";
 import {sendEmail} from '../middleware/mail'
+import jwt from 'jsonwebtoken'
+import { _jwt } from "zod/v4/core";
 
 export class AuthController {
-     static signup =  errorHandler(async (request : NextRequest)=>{
+     static signup =  errorHandler(async (request : NextRequest ,response : NextResponse)=>{
             //to be finished later
             //get user data from the response
             console.log(1);
@@ -77,7 +79,7 @@ export class AuthController {
     })
 
     //account verification function
-    static verificationCode = errorHandler(async (request : NextRequest)=>{
+    static verificationCode = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
         const body =await request.json()
         //get user from db based on the email
         const user = await AuthServices.getUserByEmail(body.email)
@@ -116,7 +118,7 @@ export class AuthController {
 
     //verify account function
 
-    static verifyAccount = errorHandler(async (request : NextRequest)=>{
+    static verifyAccount = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
         
         const body = await request.json() 
         //get the user from the database
@@ -204,7 +206,7 @@ export class AuthController {
             )
     })
 
-    static forgotPassword = errorHandler(async (request : NextRequest)=>{
+    static forgotPassword = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
         const body = await request.json()
         console.log(body);
         
@@ -283,5 +285,44 @@ export class AuthController {
             }
         )
 
+    })
+
+    //log out function
+    static logOut = errorHandler (async (request : NextRequest ,res : NextResponse) =>{
+        //updating the lastActive field for the user
+        console.log(7);
+        
+        const token = request.cookies.get('jwt')
+        console.log(token);
+
+        //check if token exists
+        if (!token) {
+            throw new appError('you are not logged in', 401)
+        }
+        const decoded =  jwt.decode(token?.value , process.env.JWT_SECRET )
+
+        console.log(decoded);
+        if (!decoded) {
+            throw new appError('invalid token' , 401)
+        }
+        
+        //updating the last active field for the user
+        const user = await  AuthServices.settingLastActive(decoded.id , decoded.name)
+        console.log(user);
+        if(!user){
+            throw new appError('user not found' , 404)
+        }
+        //clear cookies
+        console.log(8);
+        
+        
+        const response = NextResponse.json(
+            {success : true , message : 'logged out successfully'},
+            {status : 200}
+        )
+        response.cookies.delete('jwt' , AuthServices.cookiesOptions())
+
+
+        return response
     })
 }

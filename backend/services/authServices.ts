@@ -104,4 +104,21 @@ export class AuthServices {
         }
     })
    }
+
+   static async settingLastActive(id : number , username : string){
+    return await prisma.user.update({
+        where : {
+            id,
+            username
+        },
+        data :{
+            lastActive : new Date()
+        }
+    })
+    
+   }
+
+   static async decodeToken (token : any ){
+    return await jwt.verify(token , process.env.JWT_SECRET)
+   }
 }
