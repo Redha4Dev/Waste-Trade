@@ -2,21 +2,29 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
+import { gte } from "zod";
 
 export class AuthServices {
 
-    //used in the logIn logic
-   static async getUserByEmail (email : string){
+   static async getUserByEmail (email : string ){
     return await prisma.user.findUnique({
         where : {
-            email ,
-            isVerified : false
+            email
         }
     })
-   }
+   } 
 
-   //get the user by verification code
-   
+   static async getUserByToken (email : string , token : string){
+    return await prisma.user.findUnique({
+        where : {
+            email,
+            passwordResetToken : token,
+            passwordResetTokenExpiresIn :{
+                gte :new Date()
+            }
+        }
+    })
+   }   
 
    //hash Password
    static async hashPassword(password: string) { 
@@ -65,6 +73,34 @@ export class AuthServices {
             email,
             verificationCode,
             isVerified : false
+        }
+    })
+   }
+
+   static async createResetToken(email : string) {
+    const resetToken = crypto.randomBytes(64).toString('hex')
+    await prisma.user.update({
+        where : {
+            email
+        },
+        data : {
+            passwordResetToken : crypto.createHash('sha256').update(resetToken).digest('hex'),
+            passwordResetTokenExpiresIn : new Date(Date.now() + 10*60*1000)
+        }
+    })
+    return resetToken
+   }
+
+   //save user after reset password
+   static async saveResetPasswordUser(email : string , password: string){
+    return await prisma.user.update({
+        where : {
+            email
+        },
+        data : {
+            password,
+            passwordResetToken : null,
+            passwordResetTokenExpiresIn : null
         }
     })
    }

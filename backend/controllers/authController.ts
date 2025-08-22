@@ -117,9 +117,8 @@ export class AuthController {
     //verify account function
 
     static verifyAccount = errorHandler(async (request : NextRequest)=>{
-        console.log(5);
         
-        const body = await request.json()
+        const body = await request.json() 
         //get the user from the database
         const verificationCode = crypto.createHash('sha256').update(body.verificationCode).digest('hex')
         console.log(verificationCode);
@@ -139,7 +138,8 @@ export class AuthController {
                 verificationCode
             },
             data : {
-                isVerified : true
+                isVerified : true,
+                verificationCode :  null
             }
         })
 
@@ -202,5 +202,86 @@ export class AuthController {
                 },
                 {status: 200}
             )
+    })
+
+    static forgotPassword = errorHandler(async (request : NextRequest)=>{
+        const body = await request.json()
+        console.log(body);
+        
+        //get the user based on the email
+        const user = await AuthServices.getUserByEmail(body.email)
+        console.log(user);
+        
+        //check if the user exists
+        if (!user) {
+            throw new appError('user does not exists please signup' , 404)
+        }
+
+        //create the token
+        const token = await AuthServices.createResetToken(body.email)
+
+        //creating the email
+        //1- email url
+        const url = `http://localhost/3000/forgotPassword/${token}`
+
+        //2- email message
+        const message = `forgot your password please follow the link below to reset your password ${url}`
+
+        //sending the email
+        sendEmail ({
+            subject : 'Reset Password link valid for 10 min',
+            email : body.email,
+            message
+        })
+        //sending the response
+        return NextResponse.json(
+            {success : true , message : 'check your email'},
+            {status : 200}
+        )
+    })
+
+    //reset password function
+    static resetPassword = errorHandler(async (request : NextRequest , context : {params :{ token :string}})=>{
+        const body = await request.json()
+        const {token} = await context.params
+        
+        //get token from the request url
+        const resetToken =  await crypto.createHash('sha256').update(token).digest('hex')
+        console.log(0);
+        
+        //get user from db
+        const user = await AuthServices.getUserByToken(body.email , resetToken)
+        console.log(user);
+        
+        //check if user exists
+        if (!user) {
+            throw new appError('user does not exists' , 404)
+        }
+
+        //user password sanitization
+        const validatePassword = await Validation.validatePassword(body.password)
+
+        if (!validatePassword ) {
+            throw new appError('password not valid' , 400)
+        }
+
+        if (!validator.equals(body.password , body.confirmPassword)) {
+            throw new appError('password and confirm password are not same' , 400)
+        }
+
+        //save the user
+        body.password = await AuthServices.hashPassword(body.password)
+        const newuser = await AuthServices.saveResetPasswordUser(body.email , body.password)
+
+        return NextResponse.json(
+            {
+                success : true,
+                message : 'password tbdl',
+                data : {
+                    newuser
+                }
+            }
+        )
+
     })
 }

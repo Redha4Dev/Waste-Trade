@@ -40,6 +40,7 @@ model User {
   createdAt            DateTime  @default(now())  @map("created_at")
   lastActive           DateTime? @map("last_active")
   passwordResetToken   String?   @map("password_reset_token")
+  passwordResetTokenExpiresIn   DateTime?   @map("password_reset_token_expires_in")
   passwordChangedAt    DateTime? @map("Password_changed_at")
 
   receivedMessages     Message[] @relation("ReceiveMessage") 
