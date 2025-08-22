@@ -35,6 +35,7 @@ model User {
   password             String? 
   role                 Role      @default(Individual)
   phone                String?
+  verificationCode     String?
   isVerified           Boolean   @default(false)  @map("is_verified")
   createdAt            DateTime  @default(now())  @map("created_at")
   lastActive           DateTime? @map("last_active")

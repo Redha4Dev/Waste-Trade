@@ -3,10 +3,11 @@ import { NextRequest , NextResponse } from "next/server";
 import {AuthServices} from '../services/authServices'
 import {cookies} from 'next/headers'
 import validator from 'validator'
-import { crypto } from "crypto";
+import  crypto  from "crypto";
 import { Validation } from "../middleware/validation";
 import { errorHandler } from "../utils/errorHandler";
 import { appError } from "../utils/appError";
+import {sendEmail} from '../middleware/mail'
 
 export class AuthController {
      static signup =  errorHandler(async (request : NextRequest)=>{
@@ -77,27 +78,29 @@ export class AuthController {
 
     //account verification function
     static verificationCode = errorHandler(async (request : NextRequest)=>{
-        const body = request.json()
+        const body =await request.json()
         //get user from db based on the email
         const user = await AuthServices.getUserByEmail(body.email)
 
-        //chekc if the user exists
+        //check if the user exists
         if(!user) {
             throw new appError('user account verifies or does not exists please signUp' ,404)
         }
-
+        console.log(user);
+        
         //generate the verification Code
         const verificationCode = await AuthServices.verificationCode(body.email)
-
+        console.log(verificationCode);
+        
         //create the email
         //1- create the url
         const url = `https://localhost/3000/verify/${verificationCode}`
 
         //2- create the email message
-        const message = `verification for your Account ${verificationCode}. \n please ignore the email if your account is verified` 
+        const message = `verification for your Account ${verificationCode}. follow this like to verify your account ${url} \n please ignore the email if your account is verified` 
 
         //3- sending email 
-        Email({
+        sendEmail({
             subject:'Verification Code',
             email : body.email,
             message
@@ -111,14 +114,41 @@ export class AuthController {
         )
     }) 
 
-    //vetify account function
+    //verify account function
 
-    static verifyAccount = errorHandler(async (request : NextRequest) =>{
-        const body = request.json()
+    static verifyAccount = errorHandler(async (request : NextRequest)=>{
+        console.log(5);
+        
+        const body = await request.json()
         //get the user from the database
         const verificationCode = crypto.createHash('sha256').update(body.verificationCode).digest('hex')
+        console.log(verificationCode);
+        
+        const user = await AuthServices.getUserByEmailAndCode(body.email , verificationCode)
+        console.log(user);
+        
+        //check if the user exists
+        if (!user) {
+            throw new appError('user Does not exists or verified account' , 404)
+        }
 
-        const user = await AuthServices.getUserByEmailAndCode(email , verificationCode)
+        //update the user
+        await prisma.user.update({
+            where :{
+                email : body.email,
+                verificationCode
+            },
+            data : {
+                isVerified : true
+            }
+        })
+
+        //send the response
+
+        return NextResponse.json(
+            {success : true , message : 'account verified'},
+            {status : 204}
+        )
     })
     static login = errorHandler (async (request:NextRequest)=> {
             const {email , password} = await request.json()
