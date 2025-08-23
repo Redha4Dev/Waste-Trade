@@ -1,15 +1,23 @@
+// prisma/next 
 import { prisma } from "../../lib/prisma";
 import { NextRequest , NextResponse } from "next/server";
+
+//utils
 import {AuthServices} from '../services/authServices'
 import {cookies} from 'next/headers'
+
+//npm & built in packages
 import validator from 'validator'
 import  crypto  from "crypto";
+
+//middlewares
+import {AuthMiddleware} from '../middleware/auth'
 import { Validation } from "../middleware/validation";
+import {sendEmail} from '../middleware/mail'
+
+//services & imports
 import { errorHandler } from "../utils/errorHandler";
 import { appError } from "../utils/appError";
-import {sendEmail} from '../middleware/mail'
-import jwt from 'jsonwebtoken'
-import { _jwt } from "zod/v4/core";
 
 export class AuthController {
      static signup =  errorHandler(async (request : NextRequest ,response : NextResponse)=>{
@@ -56,7 +64,7 @@ export class AuthController {
             const token = AuthServices.createToken(newUser.username , newUser.id)
 
             const cookieOptions = AuthServices.cookiesOptions();
-            const cookieStore = await cookies();
+            const cookieStore = cookies();
             cookieStore.set({
                 name: "jwt",
                 value: token,
@@ -292,14 +300,14 @@ export class AuthController {
         //updating the lastActive field for the user
         console.log(7);
         
-        const token = request.cookies.get('jwt')
+        const token = await AuthServices.getToken(request)
         console.log(token);
 
         //check if token exists
         if (!token) {
             throw new appError('you are not logged in', 401)
         }
-        const decoded =  jwt.decode(token?.value , process.env.JWT_SECRET )
+        const decoded =  AuthMiddleware.verifyToken(token)
 
         console.log(decoded);
         if (!decoded) {

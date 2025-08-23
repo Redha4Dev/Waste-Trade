@@ -2,8 +2,7 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
-import { gte } from "zod";
-
+import {NextRequest} from 'next/server'
 export class AuthServices {
 
    static async getUserByEmail (email : string ){
@@ -39,6 +38,11 @@ export class AuthServices {
    //create token
    static async createToken (username: string , id : number){
     return jwt.sign({name : username , id : id} , process.env.JWT_SECRET , {expiresIn : process.env.JWT_EXPIRES_IN})
+   }
+
+   //get token
+   static async getToken (request : NextRequest){
+    return request.cookies.get('jwt')?.value
    }
 
    //setting JWT cookie for the user
