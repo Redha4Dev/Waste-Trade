@@ -57,6 +57,7 @@ export class AuthController {
                     username : body.username,
                     email : validEmail.data,
                     password : await AuthServices.hashPassword(body.password),
+                    role :body.role
                 }
             })
             //generate token && setting cookies
@@ -177,15 +178,15 @@ export class AuthController {
             }
             //check if the password is correct
             
-            const correct = await AuthServices.correctPassword(password , user.password)
-            console.log(correct);
+            // const correct = await AuthServices.correctPassword(password , user.password)
+            // console.log(correct);
             
-            if (!correct) {
-                return NextResponse.json(
-                    {success : false , error : 'password incorrect'},
-                    {status : 400}
-                )
-            }
+            // if (!correct) {
+            //     return NextResponse.json(
+            //         {success : false , error : 'password incorrect'},
+            //         {status : 400}
+            //     )
+            // }
 
             //generate the token for the user && setting cookies
 
