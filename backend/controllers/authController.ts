@@ -307,12 +307,13 @@ export class AuthController {
         if (!token) {
             throw new appError('you are not logged in', 401)
         }
-        const decoded =  AuthMiddleware.verifyToken(token)
+        const decoded = await AuthMiddleware.verifyToken(token)
 
         console.log(decoded);
         if (!decoded) {
             throw new appError('invalid token' , 401)
         }
+        console.log('test');
         
         //updating the last active field for the user
         const user = await  AuthServices.settingLastActive(decoded.id , decoded.name)

@@ -8,7 +8,7 @@ import { errorHandler } from '../utils/errorHandler'
 export class AuthMiddleware {
     //verifying token
     static async verifyToken(token : string) {
-        return jwt.decode(token , process.env.JWT_SECRET )
+        return await jwt.decode(token , process.env.JWT_SECRET )
     }
 
     //authorization function
