@@ -1,9 +1,12 @@
 import SellCard from '@/components/SellCard'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import { user } from '@/lib/user'
 import React from 'react'
 
-const page = () => {
+export default async function page() {
+  const currentUser = await user();
+  console.log("current user :",currentUser);
   return (
     <div className='w-full'>
       <h1 className='text-xl font-semibold '>All Listings</h1>
@@ -23,5 +26,3 @@ juice bottles...' date='10/10/2023' price='1000' quantity={30000} image='123' id
     </div>
   )
 }
-
-export default page
