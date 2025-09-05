@@ -13,6 +13,7 @@ const productSchema = z.object({
   userId: z.number().positive("invalid user id")
 });
 
+const updateProductSchema = productSchema.partial()
 export class productValidation {
     static async validateProduct(product : any){
         const errors : string[] = []
@@ -26,15 +27,29 @@ export class productValidation {
         
         return errors
     }
+    static async validateUpdateProduct(product : any){
+        const errors : string[] = []
+        const result =  updateProductSchema.safeParse(product)
+        
+        if (!result.success) {
+            result.error.issues.forEach(e => {
+                errors.push(e.message )
+            });
+        }
+        
+        return errors
+    }
 
     static async sanitizeProduct(product : any){
+        console.log(product);
+        
         return{
             title : product.title?.trim().toLowerCase(),
             description : product.description?.trim(),
             type : product.type?.trim().toLowerCase(),
             subType : product.title?.trim().toLowerCase(),
-            quantity : product.quantity? parseFloat(product.quantity) : 0.0 ,
-            price : product.price ? parseFloat(product.price) : 0.0 ,
+            quantity : product.quantity? parseFloat(product.quantity) : 1.0 ,
+            price : product.price ? parseFloat(product.price) : 1.0 ,
             status : product.status?.trim().toLowerCase(),
             userId : product.userId
         }

@@ -16,4 +16,38 @@ export class productServices {
             }    
         })
     }
+    static async getProducts(){
+        return await prisma.listing.findMany({})
+    }
+
+    static async getProduct(request : any){
+        
+        return await prisma.listing.findUnique({
+            where : {
+                id :request
+            }
+        })
+        
+    }
+    static async updateProduct(product : any , updateData : any) {
+        
+        return await prisma.listing.update({
+            where : {
+                id : product.id,
+                title : product.title
+            },
+            data :{
+                ...updateData,
+                updatedAt :new Date(Date.now())
+            }
+        })
+    }
+
+    static async deleteProduct(product : any){
+        return await prisma.listing.delete({
+            where : {
+                ...product
+            }
+        })
+    }
 }
