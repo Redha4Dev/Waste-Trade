@@ -21,7 +21,6 @@ export default class ProductController {
         //parsing request
         
         const req = await request.json()
-        console.log(req);
         
         const sanitizeProduct = await productValidation.sanitizeProduct(req);
 
