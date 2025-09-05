@@ -3,9 +3,8 @@ import {prisma} from '@/lib/prisma'
 import { AuthMiddleware } from "../middleware/auth";
 import { errorHandler } from '../utils/errorHandler';
 import { appError } from '../utils/appError';
-
+import {productValidation} from '../validation/productValidation'
 import {productServices} from '@/backend/services/productServices'
-import { success } from 'zod';
 
 export default class ProductController {
     static createProduct = errorHandler( async (request : NextRequest)=>{
@@ -22,9 +21,21 @@ export default class ProductController {
         //parsing request
         
         const req = await request.json()
-        console.log(6);
+        console.log(req);
         
-        const product = await productServices.createProduct(req)
+        const sanitizeProduct = await productValidation.sanitizeProduct(req);
+
+        const errors = await productValidation.validateProduct(sanitizeProduct)
+
+        if (errors.length > 0) {
+            errors.forEach(error => {
+                
+                return new appError(error , 400)
+            });
+        }
+        console.log('ppp');
+        
+        const product = await productServices.createProduct(sanitizeProduct)
         console.log(product);
         console.log('success');
         

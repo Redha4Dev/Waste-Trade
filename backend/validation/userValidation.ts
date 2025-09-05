@@ -1,8 +1,7 @@
-import {prisma} from '../../lib/prisma'
 import {z} from 'zod'
 
                                 
-export class Validation {
+export class userValidation {
     static  validateEmail(email : string) {
         const emailSchema = z
                               .string()

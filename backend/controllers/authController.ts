@@ -12,7 +12,7 @@ import  crypto  from "crypto";
 
 //middlewares
 import {AuthMiddleware} from '../middleware/auth'
-import { Validation } from "../middleware/validation";
+import { userValidation } from "../uservalidation/useruserValidation";
 import {sendEmail} from '../middleware/mail'
 
 //services & imports
@@ -28,8 +28,8 @@ export class AuthController {
             const body = await request.json()
             console.log(body);
             //validate and sanitize data
-            const validEmail = Validation.validateEmail(body.email)
-            const validPassword = Validation.validatePassword(body.password)
+            const validEmail = userValidation.validateEmail(body.email)
+            const validPassword = userValidation.validatePassword(body.password)
             
             if (!validEmail.success ) {
                 return NextResponse.json(
@@ -178,15 +178,15 @@ export class AuthController {
             }
             //check if the password is correct
             
-            // const correct = await AuthServices.correctPassword(password , user.password)
-            // console.log(correct);
+            const correct = await AuthServices.correctPassword(password , user.password)
+            console.log(correct);
             
-            // if (!correct) {
-            //     return NextResponse.json(
-            //         {success : false , error : 'password incorrect'},
-            //         {status : 400}
-            //     )
-            // }
+            if (!correct) {
+                return NextResponse.json(
+                    {success : false , error : 'password incorrect'},
+                    {status : 400}
+                )
+            }
 
             //generate the token for the user && setting cookies
 
