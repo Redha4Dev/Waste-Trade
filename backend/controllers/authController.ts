@@ -12,7 +12,7 @@ import  crypto  from "crypto";
 
 //middlewares
 import {AuthMiddleware} from '../middleware/auth'
-import { Validation } from "../middleware/validation";
+import { userValidation } from "../uservalidation/useruserValidation";
 import {sendEmail} from '../middleware/mail'
 
 //services & imports
@@ -28,8 +28,8 @@ export class AuthController {
             const body = await request.json()
             console.log(body);
             //validate and sanitize data
-            const validEmail = Validation.validateEmail(body.email)
-            const validPassword = Validation.validatePassword(body.password)
+            const validEmail = userValidation.validateEmail(body.email)
+            const validPassword = userValidation.validatePassword(body.password)
             
             if (!validEmail.success ) {
                 return NextResponse.json(
@@ -57,6 +57,7 @@ export class AuthController {
                     username : body.username,
                     email : validEmail.data,
                     password : await AuthServices.hashPassword(body.password),
+                    role :body.role
                 }
             })
             //generate token && setting cookies
@@ -313,6 +314,7 @@ export class AuthController {
         if (!decoded) {
             throw new appError('invalid token' , 401)
         }
+        console.log('test');
         
         //updating the last active field for the user
         const user = await  AuthServices.settingLastActive(decoded.id , decoded.name)

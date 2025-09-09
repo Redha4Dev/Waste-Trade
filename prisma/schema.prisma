@@ -10,22 +10,22 @@ datasource db {
 }
 
 enum Role {
-  Individual
-  Business
-  Recycler
-  Admin
+  individual
+  business
+  recycler
+  admin
 }
 
 enum WasteType {
-  Plastic
-  Metal
-  Organic
+  plastic
+  metal
+  organic
 }
 
 enum itemStatus {
-  Available
-  Sold
-  Reserved
+  available
+  sold
+  reserved
 }
 
 model User {
@@ -33,7 +33,7 @@ model User {
   email                String?   @unique
   username             String? 
   password             String? 
-  role                 Role      @default(Individual)
+  role                 Role      @default(individual)
   phone                String?
   verificationCode     String?
   isVerified           Boolean   @default(false)  @map("is_verified")
@@ -57,7 +57,7 @@ model Listing {
   subType        String?     @map("sub_type")
   quantity       Float
   price          Float
-  status         itemStatus  @default(Available)
+  status         itemStatus  @default(available)
   createdAt      DateTime    @default(now())     @map("created_at")
   updatedAt      DateTime    @updatedAt     @map("updated_at")
   user           User        @relation(fields: [userId], references: [id])

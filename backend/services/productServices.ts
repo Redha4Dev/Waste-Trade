@@ -1,0 +1,53 @@
+import { prisma } from "../../lib/prisma";
+
+export class productServices {
+    static async createProduct(req : any) {
+        
+        return await prisma.listing.create({
+            data : {
+                title : req.title ,
+                description : req.description,
+                type : req.type,
+                subType : req.subType,
+                quantity : req.quantity,
+                price : req.price,
+                status : req.status,
+                userId : req.userId
+            }    
+        })
+    }
+    static async getProducts(){
+        return await prisma.listing.findMany({})
+    }
+
+    static async getProduct(request : any){
+        
+        return await prisma.listing.findUnique({
+            where : {
+                id :request
+            }
+        })
+        
+    }
+    static async updateProduct(product : any , updateData : any) {
+        
+        return await prisma.listing.update({
+            where : {
+                id : product.id,
+                title : product.title
+            },
+            data :{
+                ...updateData,
+                updatedAt :new Date(Date.now())
+            }
+        })
+    }
+
+    static async deleteProduct(product : any){
+        return await prisma.listing.delete({
+            where : {
+                ...product
+            }
+        })
+    }
+}

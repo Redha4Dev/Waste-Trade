@@ -71,6 +71,7 @@ export class AuthMiddleware {
     
             return NextResponse.next()
         } catch (err) {
+            console.log(err);
             
         }
     }
