@@ -6,6 +6,11 @@ import { errorHandler } from '../utils/errorHandler'
 
 
 export class AuthMiddleware {
+
+    //parsing the request
+    static async parsingRequest (request : NextRequest){
+        return  await request.json()
+    }
     //verifying token
     static async verifyToken(token : string) {
         return await jwt.decode(token , process.env.JWT_SECRET )
@@ -37,6 +42,8 @@ export class AuthMiddleware {
     //protect routes function
     static async protectRoute(request : NextRequest){
         const token = request.cookies.get('jwt')?.value
+        console.log(2,token);
+        
 
         //check if the token exists
         if(!token) {
@@ -46,7 +53,7 @@ export class AuthMiddleware {
         try { 
             //decode the token
             const decoded = await this.verifyToken(token)
-    
+            
             if (!decoded) {
                 throw new appError('token not valid dirha fi darkm hadi' , 400)
             }
@@ -63,7 +70,7 @@ export class AuthMiddleware {
                     email : true
                 }
             })
-    
+     
             if(!user) {
                 throw new appError('user does not exists' , 404)
             }

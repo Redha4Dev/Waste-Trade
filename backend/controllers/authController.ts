@@ -12,7 +12,7 @@ import  crypto  from "crypto";
 
 //middlewares
 import {AuthMiddleware} from '../middleware/auth'
-import { userValidation } from "../uservalidation/useruserValidation";
+import { userValidation } from "../validation/userValidation";
 import {sendEmail} from '../middleware/mail'
 
 //services & imports

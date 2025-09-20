@@ -5,9 +5,11 @@ import { errorHandler } from '../utils/errorHandler';
 import { appError } from '../utils/appError';
 import {productValidation} from '../validation/productValidation'
 import {productServices} from '@/backend/services/productServices'
-import { success } from 'zod';
+import { Brygada_1918 } from 'next/font/google';
 
 export default class ProductController {
+
+    //create product operation
     static createProduct = errorHandler( async (request : NextRequest)=>{
 
         //verify user
@@ -21,7 +23,7 @@ export default class ProductController {
 
         //parsing request
         
-        const req = await request.json()
+        const req = await AuthMiddleware.parsingRequest(request)
         
         const sanitizeProduct = await productValidation.sanitizeProduct(req);
 
@@ -45,6 +47,7 @@ export default class ProductController {
         )
     })
 
+    //update product operation
     static updateProduct = errorHandler(async (request : NextRequest , context : {params : {id : number}})=>{
         //get the user
         await AuthMiddleware.protectRoute(request)
@@ -55,13 +58,13 @@ export default class ProductController {
         //parsing body
         
         //get the product
-        const {id} = await context.params
+        const {id} =  context.params
         
         const product = await productServices.getProduct(Number(id))
         console.log(product);
         
         //get updated data
-        const updatedData = await request.json()
+        const updatedData = await await AuthMiddleware.parsingRequest(request)
         console.log(updatedData);
         
         //sanitize and update data
@@ -85,8 +88,9 @@ export default class ProductController {
         )
     })
 
+    //get all products operation
     static getAllProducts = errorHandler(async (request : NextRequest)=>{
-        //get the user
+        //protect routes
         await AuthMiddleware.protectRoute(request)
 
         const products = await productServices.getProducts()
@@ -96,6 +100,31 @@ export default class ProductController {
             {status: 200}
         )
     })
+
+    //get product operation
+    static getProduct = errorHandler(async (request : NextRequest, context : {params : {id : number}})=>{
+        //protect routes
+        console.log(3);
+        
+        await AuthMiddleware.protectRoute(request)
+
+        
+        //get the id from the request params
+        const {id} = await context.params
+        
+        
+        //get the product from the db
+        const product = await productServices.getProduct(Number(id))
+
+        console.log(product);
+        
+        return NextResponse.json(
+            {success : true , product},
+            {status : 200}
+        )
+    })
+
+    //delete product operation
     static deleteProduct = errorHandler(async( request : NextRequest)=>{
 
         //get the user
@@ -107,7 +136,7 @@ export default class ProductController {
         }
 
         //parsing the request
-        const body = await request.json()
+        const body = await await AuthMiddleware.parsingRequest(request)
 
         //get the product from the db
         const product = await productServices.getProduct(body)

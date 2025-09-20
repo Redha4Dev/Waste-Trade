@@ -20,15 +20,6 @@ export class productServices {
         return await prisma.listing.findMany({})
     }
 
-    static async getProduct(request : any){
-        
-        return await prisma.listing.findUnique({
-            where : {
-                id :request
-            }
-        })
-        
-    }
     static async updateProduct(product : any , updateData : any) {
         
         return await prisma.listing.update({
@@ -41,6 +32,17 @@ export class productServices {
                 updatedAt :new Date(Date.now())
             }
         })
+    }
+
+    static async getProduct(id : number){
+        console.log(id);
+        
+        return await prisma.listing.findUnique({
+            where : {
+                id
+            },
+        })        
+        
     }
 
     static async deleteProduct(product : any){
