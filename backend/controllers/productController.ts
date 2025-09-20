@@ -92,7 +92,8 @@ export default class ProductController {
     static getAllProducts = errorHandler(async (request : NextRequest)=>{
         //protect routes
         await AuthMiddleware.protectRoute(request)
-
+        console.log(77);
+        
         const products = await productServices.getProducts()
 
         return NextResponse.json(
