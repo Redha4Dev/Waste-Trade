@@ -10,10 +10,9 @@ datasource db {
 }
 
 enum Role {
-  individual
-  business
-  recycler
-  admin
+  Seller
+  Buyer
+  Admin
 }
 
 enum WasteType {
@@ -33,7 +32,7 @@ model User {
   email                String?   @unique
   username             String? 
   password             String? 
-  role                 Role      @default(individual)
+  role                 Role      @default(Seller)
   phone                String?
   verificationCode     String?
   isVerified           Boolean   @default(false)  @map("is_verified")

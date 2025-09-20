@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,18 +25,17 @@ import { categories } from "@/app/constant";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }).max(50),
-  description: z
-    .string()
-    .min(1, { message: "description is required" })
-    .max(50),
-  price: z.coerce.number().min(0, { message: "price is required" }).max(50),
+  description: z.string().min(1, { message: "description is required" }).max(50),
+  price: z.coerce.number().min(0, { message: "price is required" }),
   unity: z.string().min(1, { message: "unity is required" }).max(50),
-  category: z.string().min(1, { message: "category is required" }).max(50),
+  type: z.string().min(1, { message: "type is required" }).max(50),
+  subType: z.string().min(1, { message: "sub type is required" }).max(50),
+  status: z.string().min(1, { message: "status is required" }).max(50),
   quantity: z.coerce.number().min(1, { message: "quantity is required" }),
+  userId: z.coerce.number().min(1, { message: "user id is required" }),
 });
 
 const SellForme = () => {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,20 +43,40 @@ const SellForme = () => {
       description: "",
       quantity: 1,
       price: 0,
-      category: "",
+      type: "",
+      subType: "",
       unity: "",
+      status: "available",
+      userId: 1,
     },
   });
 
-  // 2. Define a submit handler.
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("Form Submitted:", values);
+    try {
+      const res = await fetch("/api/product/createProduct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) {
+        alert(data.error || "Product creation failed");
+      } else {
+        alert("Product created successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong!");
+    }
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Title */}
         <FormField
           control={form.control}
           name="title"
@@ -72,6 +90,8 @@ const SellForme = () => {
             </FormItem>
           )}
         />
+
+        {/* Description */}
         <FormField
           control={form.control}
           name="description"
@@ -88,6 +108,8 @@ const SellForme = () => {
             </FormItem>
           )}
         />
+
+        {/* Quantity */}
         <FormField
           control={form.control}
           name="quantity"
@@ -95,12 +117,19 @@ const SellForme = () => {
             <FormItem>
               <FormLabel>Quantity</FormLabel>
               <FormControl>
-                <Input placeholder="How much do you have" {...field} />
+                <Input
+                  type="number"
+                  placeholder="How much do you have"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Unity */}
         <FormField
           control={form.control}
           name="unity"
@@ -108,20 +137,29 @@ const SellForme = () => {
             <FormItem>
               <FormLabel>Unity</FormLabel>
               <FormControl>
-                <Input placeholder="unity of your quantity" {...field} />
+                <Input
+                  placeholder="unity of your quantity"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Category */}
         <FormField
           control={form.control}
-          name="category"
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="capitize w-full">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
@@ -138,6 +176,26 @@ const SellForme = () => {
             </FormItem>
           )}
         />
+
+        {/* Sub Type */}
+        <FormField
+          control={form.control}
+          name="subType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sub Type</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="sub type ex ( dirty, old, new, clean ...)"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Price */}
         <FormField
           control={form.control}
           name="price"
@@ -145,12 +203,18 @@ const SellForme = () => {
             <FormItem>
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input placeholder="set price here" {...field} />
+                <Input
+                  type="number"
+                  placeholder="set price here"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button className="w-full" type="submit">
           Submit
         </Button>
