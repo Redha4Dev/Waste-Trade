@@ -25,7 +25,6 @@ export class productServices {
         return await prisma.listing.update({
             where : {
                 id : product.id,
-                title : product.title
             },
             data :{
                 ...updateData,
