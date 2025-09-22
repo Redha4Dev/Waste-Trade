@@ -45,11 +45,13 @@ export class productServices {
         
     }
 
-    static async deleteProduct(product : any){
+    static async deleteProduct(id : number){
+        console.log(8,id);
+        
         return await prisma.listing.delete({
             where : {
-                ...product
+                id
             }
-        })
+        })        
     }
 }

@@ -136,17 +136,26 @@ export default class ProductController {
             return new appError('user not found please logIn or signUp' , 404)
         }
 
-        //parsing the request
-        const body = await await AuthMiddleware.parsingRequest(request)
+        console.log(user);
+        
+        //parsing the request we need only one identifier
+        const body =  await AuthMiddleware.parsingRequest(request)
+console.log(11,body);
 
+        
         //get the product from the db
-        const product = await productServices.getProduct(body)
+        const product = await productServices.getProduct(id)
 
+        console.log(22,product);
+        
         if (!product) {
-            return new appError('product does not exist' , 404)
+            throw new appError('product does not exist' , 404)
         }
 
-        const p = await productServices.deleteProduct(product)
+        if(!user.listings.includes(product)){
+            throw new appError('you do not have the permission to delete this product', 400)
+        }
+        const p = await productServices.deleteProduct(id)
 
         return NextResponse.json(
             {success : true , data : p},

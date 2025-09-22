@@ -9,6 +9,9 @@ export class AuthMiddleware {
 
     //parsing the request
     static async parsingRequest (request : NextRequest){
+        const o = await request.json()
+        console.log(111,o);
+        
         return  await request.json()
     }
     //verifying token
@@ -41,9 +44,7 @@ export class AuthMiddleware {
 
     //protect routes function
     static async protectRoute(request : NextRequest){
-        const token = request.cookies.get('jwt')?.value
-        console.log(2,token);
-        
+        const token = request.cookies.get('jwt')?.value        
 
         //check if the token exists
         if(!token) {
@@ -52,7 +53,9 @@ export class AuthMiddleware {
 
         try { 
             //decode the token
+            
             const decoded = await this.verifyToken(token)
+            console.log(decoded);
             
             if (!decoded) {
                 throw new appError('token not valid dirha fi darkm hadi' , 400)
