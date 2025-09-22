@@ -167,9 +167,7 @@ export class AuthController {
             }
 
             //check if the user exists
-            const user = await prisma.user.findUnique({
-                where : {email}
-            })
+            const user = await AuthServices.getUserByEmail(email)
             console.log(user);
             
             if (!user) {

@@ -12,6 +12,25 @@ export class userServices {
         })
     }
 
+    //get user
+    //the function will return the whole user document 
+    static async getUser (id : number) {
+        return await prisma.user.findUnique({
+            where : {
+                id
+            },
+            select : {
+                password : false
+            }
+        })
+    }
+
+    //get all users
+    static async getAllUsers(){
+        return await prisma.user.findMany({})
+    }
+
+
     //update user
     static async updateUser(id : number , updatedData : any){
         return await prisma.user.update({
@@ -24,6 +43,7 @@ export class userServices {
         })
     }
 
+    
     //delete user
     static async deleteUser(id: number){
         return await prisma.user.delete({

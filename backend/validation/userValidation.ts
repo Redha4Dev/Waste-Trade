@@ -25,4 +25,9 @@ export class userValidation {
         return passwordSchema.safeParse(password).success
     }
 
+    static validateData (data : any){
+
+        
+    }
+
 }
