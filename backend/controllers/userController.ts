@@ -13,7 +13,8 @@ export class userController {
         //protect route
 
         await AuthMiddleware.protectRoute(request)
-
+        console.log( request.user.id);
+        
         const user = await userServices.getUser(request.user.id)
 
         if (!user) {
@@ -34,6 +35,8 @@ export class userController {
         //protect route
         await AuthMiddleware.protectRoute(request)
 
+        console.log(44);
+        
         const users = await userServices.getAllUsers()
 
         return NextResponse.json(
@@ -42,7 +45,10 @@ export class userController {
         )
     }
 
+
+
     static async updateUser(request :NextRequest) {
+console.log(3);
 
         //protect route
         await AuthMiddleware.protectRoute(request)
@@ -56,15 +62,39 @@ export class userController {
 
         let updatedData = await AuthMiddleware.parsingRequest(request)
 
-        // updatedData = await userValidation.validateInput()
+        updatedData =  userValidation.sanitizeUserData(updatedData)
+
+        const errors = userValidation.validateData(updatedData)
         
+        if (errors.length !== 0) {
+            return NextResponse.json(
+                {success : false , error : errors.join('; ')},
+                {status : 400}
+            )
+        }
+        
+         await userServices.updateUser(user.id , updatedData)
+
+        return  NextResponse.json(
+            {success : true , user},
+            {status : 200}
+        )
     }
 
-    static async deleteUser (request : NextRequest){
+    static deleteUser =errorHandler (async (request : NextRequest)=>{
         
         //protect route
         await AuthMiddleware.protectRoute(request)
 
+        const user = await userServices.deleteUser(request.user.id)
+
+        console.log(user);
+
+        return NextResponse.json(
+            {success : true },
+            {status : 204}
+        )
         
-    }
+        
+    })
 }

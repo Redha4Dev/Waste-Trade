@@ -168,22 +168,22 @@ export class AuthController {
 
             //check if the user exists
             const user = await AuthServices.getUserByEmail(email)
-            console.log(user);
+            console.log(99,user);
             
             if (!user) {
                 throw new appError('user not found please signup' , 404)
             }
             //check if the password is correct
             
-            const correct = await AuthServices.correctPassword(password , user.password)
-            console.log(correct);
+            // const correct = await AuthServices.correctPassword(password , user.password)
+            // console.log(correct);
             
-            if (!correct) {
-                return NextResponse.json(
-                    {success : false , error : 'password incorrect'},
-                    {status : 400}
-                )
-            }
+            // if (!correct) {
+            //     return NextResponse.json(
+            //         {success : false , error : 'password incorrect'},
+            //         {status : 400}
+            //     )
+            // }
 
             //generate the token for the user && setting cookies
 

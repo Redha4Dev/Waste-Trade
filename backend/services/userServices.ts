@@ -15,14 +15,20 @@ export class userServices {
     //get user
     //the function will return the whole user document 
     static async getUser (id : number) {
+        
         return await prisma.user.findUnique({
             where : {
-                id
+                id : id
             },
             select : {
+                id : true,
+                username : true,
+                email : true,
                 password : false
             }
         })
+        
+        
     }
 
     //get all users

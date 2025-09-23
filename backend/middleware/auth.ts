@@ -9,9 +9,6 @@ export class AuthMiddleware {
 
     //parsing the request
     static async parsingRequest (request : NextRequest){
-        const o = await request.json()
-        console.log(111,o);
-        
         return  await request.json()
     }
     //verifying token
@@ -43,22 +40,24 @@ export class AuthMiddleware {
     }
 
     //protect routes function
-    static async protectRoute(request : NextRequest){
+    static async protectRoute (request : NextRequest){
         const token = request.cookies.get('jwt')?.value        
 
         //check if the token exists
         if(!token) {
-            throw new appError('token not exists please login or signup' , 404)
+            throw NextResponse.json(
+                {success : false , message :'token not exists please login or signup'},
+                {status :404}
+            ) 
         }
 
         try { 
             //decode the token
             
             const decoded = await this.verifyToken(token)
-            console.log(decoded);
             
             if (!decoded) {
-                throw new appError('token not valid dirha fi darkm hadi' , 400)
+                throw next (new appError('token not valid dirha fi darkm hadi' , 400))
             }
     
             //get the user
@@ -74,8 +73,9 @@ export class AuthMiddleware {
                 }
             })
      
+            
             if(!user) {
-                throw new appError('user does not exists' , 404)
+                return NextResponse.json({ success:false , message: "User not found" }, { status: 404 });
             }
             request.user = user
     
