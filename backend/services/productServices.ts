@@ -20,21 +20,11 @@ export class productServices {
         return await prisma.listing.findMany({})
     }
 
-    static async getProduct(request : any){
-        
-        return await prisma.listing.findUnique({
-            where : {
-                id :request
-            }
-        })
-        
-    }
     static async updateProduct(product : any , updateData : any) {
         
         return await prisma.listing.update({
             where : {
                 id : product.id,
-                title : product.title
             },
             data :{
                 ...updateData,
@@ -43,11 +33,24 @@ export class productServices {
         })
     }
 
-    static async deleteProduct(product : any){
+    static async getProduct(id : number){
+        console.log(id);
+        
+        return await prisma.listing.findUnique({
+            where : {
+                id
+            },
+        })        
+        
+    }
+
+    static async deleteProduct(id : number){
+        console.log(8,id);
+        
         return await prisma.listing.delete({
             where : {
-                ...product
+                id
             }
-        })
+        })        
     }
 }

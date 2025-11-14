@@ -9,6 +9,12 @@ export class AuthServices {
     return await prisma.user.findUnique({
         where : {
             email
+        },
+        select : {
+            id : true,
+            username : true,
+            email : true,
+            password: true
         }
     })
    } 

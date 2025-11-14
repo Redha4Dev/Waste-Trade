@@ -5,6 +5,7 @@ import { NextRequest , NextResponse } from "next/server";
 //utils
 import {AuthServices} from '../services/authServices'
 import {cookies} from 'next/headers'
+import { userServices } from "../services/userServices";
 
 //npm & built in packages
 import validator from 'validator'
@@ -25,10 +26,13 @@ export class AuthController {
             //get user data from the response
             console.log(1);
             
-            const body = await request.json()
+            const body = await AuthMiddleware.parsingRequest(request)
             console.log(body);
+
+
             //validate and sanitize data
             const validEmail = userValidation.validateEmail(body.email)
+            body.email = validEmail.data
             const validPassword = userValidation.validatePassword(body.password)
             
             if (!validEmail.success ) {
@@ -50,16 +54,11 @@ export class AuthController {
                     {status : 400}
                 )
             }
+            body.password = await AuthServices.hashPassword(request.password)
+
 
             //create user
-            const newUser = await prisma.user.create({
-                data :{
-                    username : body.username,
-                    email : validEmail.data,
-                    password : await AuthServices.hashPassword(body.password),
-                    role :body.role
-                }
-            })
+            const newUser = await userServices.createUser(body)
             //generate token && setting cookies
             
             const token = AuthServices.createToken(newUser.username , newUser.id)
@@ -89,7 +88,7 @@ export class AuthController {
 
     //account verification function
     static verificationCode = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
-        const body =await request.json()
+        const body =await AuthMiddleware.parsingRequest(request)
         //get user from db based on the email
         const user = await AuthServices.getUserByEmail(body.email)
 
@@ -129,7 +128,7 @@ export class AuthController {
 
     static verifyAccount = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
         
-        const body = await request.json() 
+        const body = await AuthMiddleware.parsingRequest(request) 
         //get the user from the database
         const verificationCode = crypto.createHash('sha256').update(body.verificationCode).digest('hex')
         console.log(verificationCode);
@@ -162,31 +161,29 @@ export class AuthController {
         )
     })
     static login = errorHandler (async (request:NextRequest)=> {
-            const {email , password} = await request.json()
+            const {email , password} = await AuthMiddleware.parsingRequest(request)
             if (!email || !password) {
                  throw new appError('fields required' , 400)
             }
 
             //check if the user exists
-            const user = await prisma.user.findUnique({
-                where : {email}
-            })
-            console.log(user);
+            const user = await AuthServices.getUserByEmail(email)
+            console.log(99,user);
             
             if (!user) {
                 throw new appError('user not found please signup' , 404)
             }
             //check if the password is correct
             
-            const correct = await AuthServices.correctPassword(password , user.password)
-            console.log(correct);
+            // const correct = await AuthServices.correctPassword(password , user.password)
+            // console.log(correct);
             
-            if (!correct) {
-                return NextResponse.json(
-                    {success : false , error : 'password incorrect'},
-                    {status : 400}
-                )
-            }
+            // if (!correct) {
+            //     return NextResponse.json(
+            //         {success : false , error : 'password incorrect'},
+            //         {status : 400}
+            //     )
+            // }
 
             //generate the token for the user && setting cookies
 
@@ -216,7 +213,7 @@ export class AuthController {
     })
 
     static forgotPassword = errorHandler(async (request : NextRequest ,response : NextResponse)=>{
-        const body = await request.json()
+        const body = await AuthMiddleware.parsingRequest(request)
         console.log(body);
         
         //get the user based on the email
@@ -253,7 +250,7 @@ export class AuthController {
 
     //reset password function
     static resetPassword = errorHandler(async (request : NextRequest , context : {params :{ token :string}})=>{
-        const body = await request.json()
+        const body = await AuthMiddleware.parsingRequest(request)
         const {token} = await context.params
         
         //get token from the request url
