@@ -1,24 +1,33 @@
+//DataBase imports
 import {prisma} from '../../lib/prisma'
+
+//middlewares
 import {errorHandler} from '../utils/errorHandler'
 import {appError} from '../utils/appError'
-import { NextRequest , NextResponse } from 'next/server'
 import { AuthMiddleware } from '../middleware/auth'
+
+//next.js imports
+import { NextRequest , NextResponse } from 'next/server'
+
+//user services and validation
 import { userServices } from '../services/userServices'
-import { request } from 'http'
 import { userValidation } from '../validation/userValidation'
+
+
 export class userController {
     
     //to be used in the dashboard
     static  UserInfo = errorHandler (async (request : NextRequest)=>{
+       
         //protect route
-
         await AuthMiddleware.protectRoute(request)
-        console.log( request.user.id);
-        
         const user = await userServices.getUser(request.user.id)
 
         if (!user) {
-            throw new appError('user nt found please trey to verify your credentials' ,404)
+            return NextResponse.json(
+                {success :false , message : 'Unauthorized: User does not exist'},
+                {status : 401}
+            )
         }
 
         return NextResponse.json(
@@ -32,11 +41,10 @@ export class userController {
     //used by the admin
     static async getAllUsers (request : NextRequest){
 
-        //protect route
+        //protect route and authorization
         await AuthMiddleware.protectRoute(request)
-
-        console.log(44);
-        
+        await AuthMiddleware.verifyAuthorization(request , ['admin'])
+                
         const users = await userServices.getAllUsers()
 
         return NextResponse.json(
@@ -46,15 +54,14 @@ export class userController {
     }
 
 
-
+    //update user function
     static async updateUser(request :NextRequest) {
-console.log(3);
 
         //protect route
         await AuthMiddleware.protectRoute(request)
 
         //get the user
-        const user = await userServices.getUser(request.user?.id)
+        const user = await userServices.getUser(request.user.id)
 
         if (!user) {
             throw new appError('user does not exist', 404)
@@ -81,6 +88,7 @@ console.log(3);
         )
     }
 
+    //delete user function
     static deleteUser =errorHandler (async (request : NextRequest)=>{
         
         //protect route

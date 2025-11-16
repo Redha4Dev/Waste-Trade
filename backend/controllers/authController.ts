@@ -32,7 +32,8 @@ export class AuthController {
 
             //validate and sanitize data
             const validEmail = userValidation.validateEmail(body.email)
-            body.email = validEmail.data
+            console.log(validEmail);
+            
             const validPassword = userValidation.validatePassword(body.password)
             
             if (!validEmail.success ) {
@@ -41,12 +42,14 @@ export class AuthController {
                     {status : 400}
                 )
             }
+            body.email = validEmail.data
             if (!validPassword ) {
                 return NextResponse.json(
                     {success : false , error : 'password Validation failed'},
                     {status : 400}
                 )
             }
+            console.log(body.password);
             
             if (!validator.equals(body.password , body.confirmPassword)) {
                 return NextResponse.json(
@@ -54,7 +57,7 @@ export class AuthController {
                     {status : 400}
                 )
             }
-            body.password = await AuthServices.hashPassword(request.password)
+            body.password = await AuthServices.hashPassword(body.password)
 
 
             //create user

@@ -1,11 +1,17 @@
-import {NextRequest , NextResponse} from 'next/server'
+//DataBase imports
 import {prisma} from '@/lib/prisma'
-import { AuthMiddleware } from "../middleware/auth";
+
+//next.js imports
+import {NextRequest , NextResponse} from 'next/server'
+
+//middleWares
 import { errorHandler } from '../utils/errorHandler';
 import { appError } from '../utils/appError';
+import { AuthMiddleware } from "../middleware/auth";
+
+//product validation and services
 import {productValidation} from '../validation/productValidation'
 import {productServices} from '@/backend/services/productServices'
-import { Brygada_1918 } from 'next/font/google';
 
 export default class ProductController {
 
@@ -18,7 +24,10 @@ export default class ProductController {
         console.log(user);
 
         if(!user) {
-            return new appError('user not found please logIn or signUp', 404)
+            return NextResponse.json(
+                {success : true , message : 'user not found'},
+                {status : 404}
+            )
         }
 
         //parsing request
