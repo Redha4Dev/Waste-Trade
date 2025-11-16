@@ -49,7 +49,7 @@ export function AppSidebar() {
           <h1 className="text-3xl text-green-600 text-semibold bricolage-grotesque">LOGO</h1>
         </div>
         <SidebarGroup>
-          <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+          <SidebarGroupLabel className="mx-auto">Dashboard</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

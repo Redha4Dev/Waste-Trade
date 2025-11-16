@@ -38,7 +38,18 @@ const bricolageGrotesque = localFont({
     },
   ],
   variable: "--font-bricolage-grotesque",
-})
+});
+
+const momoSignature = localFont({
+  src: [
+    {
+      path: "../public/fonts/MomoSignature-Regular.ttf",
+      weight: "400", 
+      style: "normal",
+    },
+  ],
+  variable: "--font-momo-signature",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -53,11 +64,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${bricolageGrotesque.className} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${bricolageGrotesque.className} ${momoSignature.variable} antialiased`}
       >
-        
         <Navbar />
-        {children}
+        <div className="pt-[64px] justify-center flex min-h-screen">
+          {children}
+        </div>
       </body>
     </html>
   );
