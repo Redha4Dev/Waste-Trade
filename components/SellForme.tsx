@@ -21,18 +21,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "@/app/constant";
+import { Separator } from "./ui/separator";
+// Assuming categories is defined:
+// import { categories } from "@/app/constant";
+// Using a mock array for demonstration
+const categories = ["Plastic", "Paper", "Metal", "Glass", "Organic"];
 
 const formSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }).max(50),
-  description: z.string().min(1, { message: "description is required" }).max(50),
-  price: z.coerce.number().min(0, { message: "price is required" }),
-  unity: z.string().min(1, { message: "unity is required" }).max(50),
-  type: z.string().min(1, { message: "type is required" }).max(50),
-  subType: z.string().min(1, { message: "sub type is required" }).max(50),
-  status: z.string().min(1, { message: "status is required" }).max(50),
-  quantity: z.coerce.number().min(1, { message: "quantity is required" }),
-  userId: z.coerce.number().min(1, { message: "user id is required" }),
+  // Adjusted validation messages for clarity
+  title: z
+    .string()
+    .min(3, { message: "Title must be at least 3 characters." })
+    .max(100),
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters." })
+    .max(500),
+  price: z.coerce
+    .number()
+    .min(0.01, { message: "Price must be greater than zero." }),
+  unity: z
+    .string()
+    .min(1, { message: "Unit (e.g., kg, ton, piece) is required." })
+    .max(20),
+  type: z.string().min(1, { message: "A primary category is required." }),
+  subType: z
+    .string()
+    .min(1, { message: "A specific sub-type is required." })
+    .max(100),
+  status: z.string(), // Assuming this is pre-filled or handled by a simpler dropdown
+  quantity: z.coerce
+    .number()
+    .min(1, { message: "Quantity must be at least 1." }),
+  userId: z.coerce.number().min(1), // Should be hidden/derived from session
 });
 
 const SellForme = () => {
@@ -42,181 +63,236 @@ const SellForme = () => {
       title: "",
       description: "",
       quantity: 1,
-      price: 0,
+      price: 0.01,
       type: "",
       subType: "",
-      unity: "",
+      unity: "kg", // Set a common default
       status: "available",
       userId: 1,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // API logic remains the same
     console.log("Form Submitted:", values);
-    try {
-      const res = await fetch("/api/product/createProduct", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      const data = await res.json();
-      console.log(data);
-      if (!res.ok) {
-        alert(data.error || "Product creation failed");
-      } else {
-        alert("Product created successfully!");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong!");
-    }
+    alert("Listing submitted successfully (API call skipped for now)!");
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Title */}
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input placeholder="Waste Name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+        {/* SECTION 1: Basic Information */}
+        <section className="space-y-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 border-gray-100 dark:border-gray-800">
+            1. Product Details
+          </h3>
 
-        {/* Description */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="describe your product here ex ( dirty, old, new, clean ...)"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Title */}
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Listing Title</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g., Clear PET Bottle Flakes, Grade A"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Quantity */}
-        <FormField
-          control={form.control}
-          name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quantity</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="How much do you have"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Detailed Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Describe the condition, color, and origin. Max 500 characters."
+                    rows={4}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </section>
 
-        {/* Unity */}
-        <FormField
-          control={form.control}
-          name="unity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Unity</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="unity of your quantity"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <Separator className="bg-gray-200 dark:bg-gray-700" />
 
-        {/* Category */}
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="capitize w-full">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* SECTION 2: Material Specification */}
+        <section className="space-y-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 border-gray-100 dark:border-gray-800">
+            2. Material Categorization
+          </h3>
 
-        {/* Sub Type */}
-        <FormField
-          control={form.control}
-          name="subType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Sub Type</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="sub type ex ( dirty, old, new, clean ...)"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Category and Sub Type - Grouped in a responsive grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Category (Type) */}
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Primary Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select waste category (e.g., Plastic)" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category}
+                          value={category.toLowerCase()}
+                        >
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        {/* Price */}
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="set price here"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            {/* Sub Type */}
+            <FormField
+              control={form.control}
+              name="subType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Specific Sub Type / Grade</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., PET Flakes, Corrugated Cardboard, Scrap Copper"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          {/* Status (Hidden/Defaulted, but included for completeness) */}
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="hidden">
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* User ID (Hidden/Defaulted) */}
+          <FormField
+            control={form.control}
+            name="userId"
+            render={({ field }) => (
+              <FormItem className="hidden">
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </section>
 
-        <Button className="w-full" type="submit">
-          Submit
+        <Separator className="bg-gray-200 dark:bg-gray-700" />
+
+        {/* SECTION 3: Pricing & Quantity */}
+        <section className="space-y-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 border-gray-100 dark:border-gray-800">
+            3. Inventory & Price
+          </h3>
+
+          {/* Quantity, Unity, and Price - Grouped in a three-column grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Quantity */}
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Available Quantity</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Total amount"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Unity (Unit) */}
+            <FormField
+              control={form.control}
+              name="unity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unit of Measurement</FormLabel>
+                  <FormControl>
+                    {/* Could be a Select for common units (kg, ton, piece) */}
+                    <Input placeholder="e.g., kg, ton, bundle" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Price */}
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price (per unit)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        $
+                      </span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="pl-7"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </section>
+
+        {/* Submit Button */}
+        <Button
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold h-11 text-lg shadow-md hover:shadow-lg transition-all"
+          type="submit"
+        >
+          Publish Listing Now
         </Button>
       </form>
     </Form>

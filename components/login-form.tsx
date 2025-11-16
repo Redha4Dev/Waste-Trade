@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
+import { Leaf } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -64,9 +65,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="border-green-500 border-[2.5px] rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-center">
-            <h1 className="text-3xl text-green-600 text-semibold bricolage-grotesque">
-              LOGO
+          <CardTitle className="text-center flex justify-center">
+            <h1 className="text-3xl flex mx-auto text-green-600 font-normal  font-momo">
+              Wast <Leaf className="w-8 h-8" />
             </h1>
           </CardTitle>
           <CardDescription>
