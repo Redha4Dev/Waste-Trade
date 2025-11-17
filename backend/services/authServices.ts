@@ -33,7 +33,6 @@ export class AuthServices {
 
    //hash Password
    static async hashPassword(password: string) { 
-    console.log(password , 999);
     
        return await bcrypt.hash(password , 11)
    }

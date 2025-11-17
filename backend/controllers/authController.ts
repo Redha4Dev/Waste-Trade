@@ -67,10 +67,10 @@ export class AuthController {
             const token = AuthServices.createToken(newUser.username , newUser.id)
 
             const cookieOptions = AuthServices.cookiesOptions();
-            const cookieStore = cookies();
+            const cookieStore = await cookies();
             cookieStore.set({
                 name: "jwt",
-                value: token,
+                value: token ,
                 ...cookieOptions,
             });
             //send response

@@ -44,7 +44,7 @@ export default class ProductController {
                 return new appError(error , 400)
             });
         }
-        console.log('ppp');
+        console.log('ppp' , sanitizeProduct);
         
         const product = await productServices.createProduct(sanitizeProduct)
         console.log(product);
@@ -153,7 +153,7 @@ console.log(11,body);
 
         
         //get the product from the db
-        const product = await productServices.getProduct(id)
+        const product = await productServices.getProduct(body.id)
 
         console.log(22,product);
         
@@ -164,7 +164,7 @@ console.log(11,body);
         if(!user.listings.includes(product)){
             throw new appError('you do not have the permission to delete this product', 400)
         }
-        const p = await productServices.deleteProduct(id)
+        const p = await productServices.deleteProduct(body.id)
 
         return NextResponse.json(
             {success : true , data : p},

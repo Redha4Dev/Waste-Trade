@@ -12,6 +12,7 @@ import { NextRequest , NextResponse } from 'next/server'
 //user services and validation
 import { userServices } from '../services/userServices'
 import { userValidation } from '../validation/userValidation'
+import { error } from 'console'
 
 
 export class userController {
@@ -39,7 +40,7 @@ export class userController {
 
     //get all users
     //used by the admin
-    static async getAllUsers (request : NextRequest){
+    static getAllUsers = errorHandler(async (request : NextRequest)=>{
 
         //protect route and authorization
         await AuthMiddleware.protectRoute(request)
@@ -51,11 +52,11 @@ export class userController {
             {success : true , users},
             {status: 200}
         )
-    }
+    })
 
 
     //update user function
-    static async updateUser(request :NextRequest) {
+    static updateUser = errorHandler(async (request :NextRequest) =>{
 
         //protect route
         await AuthMiddleware.protectRoute(request)
@@ -86,7 +87,7 @@ export class userController {
             {success : true , user},
             {status : 200}
         )
-    }
+    })
 
     //delete user function
     static deleteUser =errorHandler (async (request : NextRequest)=>{
