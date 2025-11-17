@@ -100,8 +100,10 @@ export default class ProductController {
     //get all products operation
     static getAllProducts = errorHandler(async (request : NextRequest)=>{
         //protect routes
+        console.log(333);
+        
         await AuthMiddleware.protectRoute(request)
-        console.log(77);
+        console.log(77 , 'test');
         
         const products = await productServices.getProducts()
 

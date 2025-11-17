@@ -9,8 +9,26 @@ import { Button } from '@/components/ui/button'
 export default async function ListingsPage() {
   // const currentUser = await user();
   // console.log("current user :", currentUser);
+  let listingData  = [];
 
   // NOTE: Replace with actual data fetching logic later
+  try {
+    
+    const listingsRes = await fetch('http://localhost:3000/api/product/getAllProducts', {
+  method: 'GET',
+  headers: { 
+    'Content-type': 'application/json',
+  "Cookie": `jwt` },
+});
+    
+    listingData = await listingsRes.json()
+    listingData = listingData.products
+    console.log(listingData);
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
   const mockListings = [
     { title: 'PET Bottles', description: 'Any type empty plastic bottles ex: water bottles, energy drink bottles, juice bottles...', date: '10/10/2023', price: '1000', quantity: 30000, image: '/recycling-illustration.png', id: '1' },
     { title: 'HDPE Containers', description: 'Natural and colored HDPE (high-density polyethylene) containers with or without a CRV label.', date: '10/10/2023', price: '4000', quantity: 30000, image: '/recycling-illustration.png', id: '33' },
@@ -44,15 +62,15 @@ export default async function ListingsPage() {
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8'>
-        {mockListings.map((listing) => (
+        {listingData.map((listing) => (
           <SellCard 
             key={listing.id}
             title={listing.title}
             description={listing.description}
-            date={listing.date}
+            date={listing.date || Date.now()}
             price={listing.price}
             quantity={listing.quantity}
-            image={listing.image}
+            image={listing.image || '/recycling-illustration.png'}
             id={listing.id}
           />
         ))}

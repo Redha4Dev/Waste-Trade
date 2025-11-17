@@ -42,6 +42,7 @@ export class AuthMiddleware {
     //protect routes function
     static async protectRoute (request : NextRequest){
         const token = request.cookies.get('jwt')?.value        
+console.log(request);
 
         //check if the token exists
         if(!token) {

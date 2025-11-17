@@ -66,12 +66,15 @@ export class AuthController {
             
             const token = AuthServices.createToken(newUser.username , newUser.id)
 
-            const cookieOptions = AuthServices.cookiesOptions();
-            const cookieStore = await cookies();
+            const cookieStore = await cookies(); 
+
             cookieStore.set({
                 name: "jwt",
-                value: token ,
-                ...cookieOptions,
+                value: token,
+                httpOnly: true,
+                sameSite: "lax",
+                secure: process.env.NODE_ENV === "production",
+                path: "/",
             });
             //send response
             console.log(newUser);
@@ -178,27 +181,32 @@ export class AuthController {
             }
             //check if the password is correct
             
-            // const correct = await AuthServices.correctPassword(password , user.password)
-            // console.log(correct);
+            const correct = await AuthServices.correctPassword(password , user.password)
+            console.log(correct);
             
-            // if (!correct) {
-            //     return NextResponse.json(
-            //         {success : false , error : 'password incorrect'},
-            //         {status : 400}
-            //     )
-            // }
+            if (!correct) {
+                return NextResponse.json(
+                    {success : false , error : 'password incorrect'},
+                    {status : 400}
+                )
+            }
 
             //generate the token for the user && setting cookies
 
             const token = await AuthServices.createToken(user.username , user.id);
+            console.log(token);
             
-            const cookieOptions = AuthServices.cookiesOptions();
-            const cookieStore = await cookies();
+            const cookieStore = await cookies(); // MUST await
+
             cookieStore.set({
                 name: "jwt",
                 value: token,
-                ...cookieOptions,
+                httpOnly: true,
+                sameSite: "lax",
+                secure: process.env.NODE_ENV === "production",
+                path: "/",
             });
+
             //send the response
             return NextResponse.json(
                 {
