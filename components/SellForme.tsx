@@ -76,6 +76,22 @@ const SellForme = () => {
     // API logic remains the same
     console.log("Form Submitted:", values);
     alert("Listing submitted successfully (API call skipped for now)!");
+    try {
+      const response = await fetch('/api/product/createProduct',{ 
+        method : "POST",
+        headers: { 
+              'Content-type': 'application/json',
+              "Cookie": `jwt` 
+        },
+        body : JSON.stringify(values),
+      })
+
+      console.log(response);
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
   };
 
   return (
