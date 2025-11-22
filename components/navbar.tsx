@@ -1,40 +1,63 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "./ui/button";
 import NavItems from "./navItems";
-import { user } from "@/lib/user";
-import Logout from "./Logout";
-import AuthItem from "./AuthItem";
 import { Leaf, Menu } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
-const Navbar = async () => {
-  const currentUser = await user();
+const Navbar = () => {
+  const { user, loading, logout } = useAuth();
 
   return (
-    // Fixed container spanning full width with a distinct background and shadow.
     <nav className="fixed top-0 left-0 w-full h-16 bg-white dark:bg-gray-900 shadow-md z-50">
-      
-      {/* Content wrapper: Max width and centered for consistent desktop layout */}
       <div className="flex items-center justify-between h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Logo/Brand Section */}
+        {/* Logo */}
         <Link href="/" className="flex items-center flex-shrink-0">
           <h1 className="text-2xl sm:text-3xl text-green-600 flex items-center font-momo-signature">
             Wasto
-            <Leaf className="w-5 h-5 sm:w-6 sm:h-6 ml-1" />
+            <Leaf className="w-8 h-8" />
           </h1>
         </Link>
-        
-        {/* Main Navigation (NavItems) - Hidden on small screens if necessary */}
+
+        {/* Navigation Items */}
         <div className="hidden md:flex flex-grow justify-center">
           <NavItems />
         </div>
-        
-        
-        <div className="flex items-center space-x-2">
-          <AuthItem />
+
+        {/* AUTH BUTTON AREA */}
+        <div className="flex items-center space-x-4">
+
+          {/* While loading */}
+          {loading && (
+            <Button variant="outline" disabled>
+              Loading...
+            </Button>
+          )}
+
+          {/* Not logged in → Show Login button */}
+          {!loading && !user && (
+            <Link href="/sign-in">
+              <Button variant="outline">Login</Button>
+            </Link>
+          )}
+
+          {/* Logged in → Show username + logout */}
+          {!loading && user && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium">
+                Hi, {user.username || user.email}
+              </span>
+
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          )}
         </div>
-        
-        
+
+        {/* Mobile Menu Button */}
         <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="w-6 h-6" />
         </Button>

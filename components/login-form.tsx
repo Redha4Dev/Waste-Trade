@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
 import { Leaf } from "lucide-react";
+import { user } from "@/lib/user";
+import { useAuth } from "@/context/AuthContext";
 
 export function LoginForm({
   className,
@@ -25,6 +27,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { refreshUser } = useAuth();
 
   const router = useRouter();
 
@@ -50,6 +53,8 @@ export function LoginForm({
       }
 
       console.log("✅ Login success:", data);
+      
+      await refreshUser();
 
       // Navigate to /browser after successful login
       router.push("/seller");
