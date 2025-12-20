@@ -6,7 +6,7 @@ import axios from "axios";
 type User = {
   id: string;
   email: string;
-  name?: string;
+  username: string | null;
 };
 
 type AuthContextType = {
@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   async function refreshUser() {
     try {
       const res = await axios.get("/api/userRoutes/getUser");
+      console.log('refrech user : ', res.data);
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
